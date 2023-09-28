@@ -40,6 +40,7 @@ app.post('/api/uploads', function(req, res){
             res.json({ Message: "Failed"})
         }
         else{
+            console.log(req.file)
             res.status(400).json({ 
                 status: "Success", 
                 message: "File uploaded successfully",
