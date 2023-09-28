@@ -1,7 +1,6 @@
 const express = require('express')
 const multer = require('multer')
 const path = require('path');
-const cloudinary = require('cloudinary').v2
 
 const uploadPath = path.join(process.cwd(), '/uploads')
 
@@ -20,7 +19,6 @@ const storage = multer.diskStorage({
             cb(null, file.originalname)
         } else {
             cb(null, multer.MulterError)
-            console.log("Error file type not supported")
         }
     }
 }).single('vid1')
@@ -46,15 +44,14 @@ app.post('/api/uploads', function(req, res){
             return res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
         else if(err){
-            console.log(err)
-            res.json({ Message: "Failed"})
+            
+            res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
         else{
-            console.log(req.file)
             res.status(400).json({ 
                 status: "Success", 
                 message: "File uploaded successfully",
-                video_url: req.file.originalname 
+                video_url: "https://hngx-vid.onrender.com/api/" + req.file.originalname 
             })
         }
     })
