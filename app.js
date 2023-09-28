@@ -26,10 +26,18 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.get ('/api', function(req,res){
+    res.status(200).json({ Message: "Welcome to my video api"})
+})
+
 app.post('/api/uploads', function(req, res){
     upload(req, res, function(err){
         if (err instanceof multer.MulterError){
             return res.status(400).json({ status: "Failed", message: "File upload failed" })
+        }
+        else if(err){
+            console.log(err)
+            res.json({ Message: "Failed"})
         }
         else{
             res.status(400).json({ 
