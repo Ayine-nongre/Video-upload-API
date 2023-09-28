@@ -1,6 +1,7 @@
 const express = require('express')
 const multer = require('multer')
 const path = require('path');
+const cloudinary = require('cloudinary').v2
 
 const uploadPath = path.join(process.cwd(), '/uploads')
 
@@ -33,6 +34,12 @@ app.get ('/api', function(req,res){
     res.status(200).json({ Message: "Welcome to my video api"})
 })
 
+app.get('/api/:filename', function(req, res){
+    const name = req.params.filename
+    const videoPath = path.join(process.cwd(), '/uploads/') + name
+    res.sendFile(videoPath)
+})
+
 app.post('/api/uploads', function(req, res){
     upload(req, res, function(err){
         if (err instanceof multer.MulterError){
@@ -47,7 +54,7 @@ app.post('/api/uploads', function(req, res){
             res.status(400).json({ 
                 status: "Success", 
                 message: "File uploaded successfully",
-                video_url: __dirname + "/uploads/" + req.file.originalname 
+                video_url: req.file.originalname 
             })
         }
     })
