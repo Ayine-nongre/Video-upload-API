@@ -41,6 +41,23 @@ app.get('/api/:filename', function(req, res){
     res.sendFile(videoPath)
 })
 
+app.get('/api/:filename/transcribe', async function(req, res){
+    const response = await deepgram.transcription.preRecorded(
+        { url: "https://hngx-vid.onrender.com/api/" + req.params.filename },
+        { punctuate: true, utterances: true }
+    ).catch(err => {
+        console.log(err)
+        return res.status(400).json({ status: "Failed", message: "Error getting tran"})
+    })
+
+    const srtTranscript = response.toSRT();
+
+    res.status(200).json({ 
+        status: "Success", 
+        transcript: srtTranscript 
+    })
+})
+
 app.post('/api/uploads', function(req, res){
     upload(req, res, async function(err){
         if (err instanceof multer.MulterError){
@@ -52,21 +69,10 @@ app.post('/api/uploads', function(req, res){
             res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
         else{
-            const response = await deepgram.transcription.preRecorded(
-                { url: "https://hngx-vid.onrender.com/api/" + req.params.filename },
-                { punctuate: true, utterances: true }
-            ).catch(err => {
-                console.log(err)
-                return res.status(400).json({ status: "Failed", message: "Error getting transcript"})
-            })
-        
-            const srtTranscript = response.toSRT();
-
             res.status(200).json({ 
                 status: "Success", 
                 message: "File uploaded successfully",
                 video_url: "https://hngx-vid.onrender.com/api/" + req.file.originalname, 
-                transcript: srtTranscript
             })
         }
     })
