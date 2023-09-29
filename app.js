@@ -1,6 +1,8 @@
+require('dotenv').config({path: '.env'})
 const express = require('express')
 const multer = require('multer')
 const path = require('path');
+const { Deepgram } = require('@deepgram/sdk')
 
 const uploadPath = path.join(process.cwd(), '/uploads')
 
@@ -24,6 +26,7 @@ const storage = multer.diskStorage({
 }).single('vid1')
 
 const app = express()
+const deepgram = new Deepgram(process.env.Auth)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -39,7 +42,7 @@ app.get('/api/:filename', function(req, res){
 })
 
 app.post('/api/uploads', function(req, res){
-    upload(req, res, function(err){
+    upload(req, res, async function(err){
         if (err instanceof multer.MulterError){
             return res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
@@ -48,10 +51,18 @@ app.post('/api/uploads', function(req, res){
             res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
         else{
-            res.status(400).json({ 
+            const response = await deepgram.transcription.preRecorded(
+                { url: "https://hngx-vid.onrender.com/api/" + req.file.originalname },
+                { punctuate: true, utterances: true }
+            );
+        
+            const srtTranscript = response.toSRT();
+
+            res.status(200).json({ 
                 status: "Success", 
                 message: "File uploaded successfully",
-                video_url: "https://hngx-vid.onrender.com/api/" + req.file.originalname 
+                video_url: "https://hngx-vid.onrender.com/api/" + req.file.originalname, 
+                transcript: srtTranscript
             })
         }
     })
