@@ -61,10 +61,11 @@ app.get('/api/:filename/transcribe', async function(req, res){
 app.post('/api/uploads', function(req, res){
     upload(req, res, async function(err){
         if (err instanceof multer.MulterError){
+            console.log(err)
             return res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
         else if(err){
-            
+            console.log(err)
             res.status(400).json({ status: "Failed", message: "File upload failed" })
         }
         else{
