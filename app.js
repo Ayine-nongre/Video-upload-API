@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage,
     fileFilter: (req, file ,cb) => {
-        if (file.mimetype == 'video/gif' || file.mimetype == 'video/mp4' || file.mimetype == 'video/mkv' || file.mimetype == 'video/webm'){
+        if (file.mimetype == 'video/gif' || file.mimetype == 'video/mp4' || file.mimetype == 'video/mkv' || file.mimetype == 'video/webm' || file.mimetype == 'video/blob'){
             cb(null, file.originalname)
         } else {
             cb(null, multer.MulterError)
